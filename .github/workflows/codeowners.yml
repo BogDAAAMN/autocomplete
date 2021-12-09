@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           version: 12
-      - run: npm install @octokit/action
+      - run: npm install @octokit/action typescript
       - run: npm install -g ts-node
       - run: ts-node generate-codeowners.ts
         env:
