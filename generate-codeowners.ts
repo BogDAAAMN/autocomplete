@@ -17,19 +17,33 @@ const run = async () => {
     }
   );
 
-  const reactionsUrls = commentsResponse.data
-    .filter((comment) => {
-      return (
-        comment.user.login == FIG_BOT_USERNAME &&
-        comment.body.startsWith("# CODEOWNERS") &&
-        comment.reactions["+1"] > 0
-      );
-    })
-    .map((comment) => {
-      return comment.reactions.url;
-    });
+  const reactedComments = commentsResponse.data.filter((comment) => {
+    return (
+      comment.user.login == FIG_BOT_USERNAME &&
+      comment.body.startsWith("# CODEOWNERS") &&
+      comment.reactions["+1"] > 0
+    );
+  });
 
-  console.log(reactionsUrls);
+  const reactionsUsers = reactedComments.map(async (comment) => {
+    const reactionsResponse = await octokit.request(
+      "GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions",
+      {
+        owner,
+        repo,
+        comment_id: comment.id,
+      }
+    );
+
+    return reactionsResponse.data.map((reaction) => {
+      return {
+        user: reaction.user,
+        content: reaction.content,
+      };
+    });
+  });
+
+  console.log(reactionsUsers);
   console.log(owner, repo, refs, pull, prNumber, merge);
 };
 
