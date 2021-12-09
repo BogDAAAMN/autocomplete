@@ -1,0 +1,16 @@
+name: My Node Action
+on:
+  - push
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          version: 12
+      - run: npm install @octokit/action
+      - run: npm install -g ts-node
+      - run: ts-node generate-codeowners.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
