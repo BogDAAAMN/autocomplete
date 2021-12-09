@@ -2,6 +2,8 @@ import { Octokit } from "@octokit/action";
 
 const octokit = new Octokit();
 
+const FIG_BOT_USERNAME = "BogDAAAMN";
+
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 const [refs, pull, prNumber, merge] = process.env.GITHUB_REF.split("/");
 
@@ -18,7 +20,7 @@ const run = async () => {
   const reactionsUrls = commentsResponse.data
     .filter((comment) => {
       return (
-        comment.user.login == "withfig-bot" &&
+        comment.user.login == FIG_BOT_USERNAME &&
         comment.body.startsWith("# CODEOWNERS") &&
         comment.reactions["+1"] > 0
       );
