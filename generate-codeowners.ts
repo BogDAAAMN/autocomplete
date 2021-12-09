@@ -2,41 +2,33 @@ import { Octokit } from "@octokit/action";
 
 const octokit = new Octokit();
 
-const [owner, name] = process.env.GITHUB_REPOSITORY.split("/");
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 const [refs, pull, prNumber, merge] = process.env.GITHUB_REF.split("/");
 
 const run = async () => {
-  const response = await octokit.graphql(
-    `
-    query ($owner: String!, $name: String!, $prNumber: Int!) {
-        repository(owner: $owner, name: $name) {
-          pullRequest(number: $prNumber) {
-            comments(first: 100) {
-              edges {
-                node {
-                  reactions(last: 100) {
-                    nodes {
-                      content
-                      user {
-                        login
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
+  const commentsResponse = await octokit.request(
+    "GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
     {
       owner,
-      name,
-      prNumber: Number(prNumber),
+      repo,
+      issue_number: Number(prNumber),
     }
   );
 
-  console.log(response);
-  console.log(owner, name, refs, pull, prNumber, merge);
+  const reactionsUrls = commentsResponse.data
+    .filter((comment) => {
+      return (
+        comment.user.login == "withfig-bot" &&
+        comment.body.startsWith("# CODEOWNERS") &&
+        comment.reactions["+1"] > 0
+      );
+    })
+    .map((comment) => {
+      return comment.reactions.url;
+    });
+
+  console.log(reactionsUrls);
+  console.log(owner, repo, refs, pull, prNumber, merge);
 };
 
 run();
