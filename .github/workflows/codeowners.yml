@@ -1,6 +1,6 @@
-name: My Node Action
+name: CODEOWNERS Generation
 on:
-  - push
+  - pull_request
 jobs:
   generate:
     runs-on: ubuntu-latest
