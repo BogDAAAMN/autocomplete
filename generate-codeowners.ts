@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/action";
 
 const octokit = new Octokit();
 
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+const [owner, name] = process.env.GITHUB_REPOSITORY.split("/");
 const [refs, pull, prNumber, merge] = process.env.GITHUB_REF.split("/");
 
 const run = async () => {
@@ -30,13 +30,13 @@ const run = async () => {
       }`,
     {
       owner,
-      name: repo,
-      prNumber,
+      name,
+      prNumber: Number(prNumber),
     }
   );
 
   console.log(response);
-  console.log(owner, repo, refs, pull, prNumber, merge);
+  console.log(owner, name, refs, pull, prNumber, merge);
 };
 
 run();
